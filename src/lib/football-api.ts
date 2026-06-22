@@ -52,7 +52,6 @@ const teamNameMap: Record<string, string> = {
   "Cape Verde Islands": "Cape Verde",
   "Cabo Verde": "Cape Verde",
   "Congo DR": "DRC",
-  "DR Congo": "DRC",
 };
 
 export function normaliseTeamName(name: string): string {
