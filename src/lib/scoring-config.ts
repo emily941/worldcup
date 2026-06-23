@@ -6,9 +6,9 @@ export const SCORING_CONFIG = {
   qualifyGroupStage: 5,    // qualify for Round of 32 (pass group)
   roundOf16: 10,
   quarterFinal: 15,
-  semiFinal: 20,
-  final: 30,
-  winTournament: 50,
+  semiFinal: 50,
+  final: 100,
+  winTournament: 150,
 } as const;
 
 export type ScoringConfig = typeof SCORING_CONFIG;

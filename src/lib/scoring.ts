@@ -61,7 +61,7 @@ export function calculateTeamScore(
     else if (scored === conceded) matchPoints += SCORING_CONFIG.draw;
   }
 
-  // Progression points — check if team appeared in knockout stages
+  // Progression points — only awarded once a team is knocked out or wins
   const knockoutMatches = matches.filter(
     (m) =>
       (m.homeTeam === teamName || m.awayTeam === teamName) &&
@@ -69,29 +69,31 @@ export function calculateTeamScore(
   );
 
   let progressionPoints = 0;
-  let highestStage = "";
 
-  for (const m of knockoutMatches) {
-    const pts = stageProgressionPoints(m.stage);
-    if (pts > progressionPoints) {
-      progressionPoints = pts;
-      highestStage = m.stage;
-    }
+  // Group stage qualification bonus: earned once they appear in any knockout match
+  if (knockoutMatches.length > 0) {
+    progressionPoints = SCORING_CONFIG.qualifyGroupStage;
   }
 
-  // Check if team won the tournament
-  const finalMatch = matches.find(
-    (m) =>
-      (m.homeTeam === teamName || m.awayTeam === teamName) &&
-      m.stage === "FINAL" &&
-      m.status === "FINISHED"
-  );
-  if (finalMatch) {
-    const isHome = finalMatch.homeTeam === teamName;
-    const scored = isHome ? (finalMatch.homeScore ?? 0) : (finalMatch.awayScore ?? 0);
-    const conceded = isHome ? (finalMatch.awayScore ?? 0) : (finalMatch.homeScore ?? 0);
-    if (scored > conceded) {
+  // Find the finished knockout match where the team was knocked out (lost)
+  // or won the tournament — only then award the stage bonus
+  const finishedKnockout = knockoutMatches.filter((m) => m.status === "FINISHED");
+
+  for (const m of finishedKnockout) {
+    const isHome = m.homeTeam === teamName;
+    const scored = isHome ? (m.homeScore ?? 0) : (m.awayScore ?? 0);
+    const conceded = isHome ? (m.awayScore ?? 0) : (m.homeScore ?? 0);
+    const won = scored > conceded;
+
+    if (won && m.stage.includes("FINAL") && !m.stage.includes("SEMI") && !m.stage.includes("QUARTER")) {
+      // Won the final — tournament winner
       progressionPoints = SCORING_CONFIG.winTournament;
+    } else if (!won) {
+      // Knocked out here — award points for this stage if it's the highest
+      const pts = stageProgressionPoints(m.stage);
+      if (pts > progressionPoints) {
+        progressionPoints = pts;
+      }
     }
   }
 
