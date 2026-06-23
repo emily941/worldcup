@@ -70,14 +70,13 @@ export function calculateTeamScore(
 
   let progressionPoints = 0;
 
-  // Group stage qualification bonus: earned once they appear in any knockout match
-  if (knockoutMatches.length > 0) {
+  // Find the finished knockout matches where the team was knocked out or won
+  const finishedKnockout = knockoutMatches.filter((m) => m.status === "FINISHED");
+
+  // Group stage qualification bonus: earned once they have played a finished knockout match
+  if (finishedKnockout.length > 0) {
     progressionPoints = SCORING_CONFIG.qualifyGroupStage;
   }
-
-  // Find the finished knockout match where the team was knocked out (lost)
-  // or won the tournament — only then award the stage bonus
-  const finishedKnockout = knockoutMatches.filter((m) => m.status === "FINISHED");
 
   for (const m of finishedKnockout) {
     const isHome = m.homeTeam === teamName;
