@@ -70,30 +70,30 @@ export function calculateTeamScore(
 
   let progressionPoints = 0;
 
-  // Find the finished knockout matches where the team was knocked out or won
   const finishedKnockout = knockoutMatches.filter((m) => m.status === "FINISHED");
 
-  // Group stage qualification bonus: earned once they have played a finished knockout match
-  if (finishedKnockout.length > 0) {
-    progressionPoints = SCORING_CONFIG.qualifyGroupStage;
-  }
-
-  for (const m of finishedKnockout) {
+  // Find if the team has been knocked out (lost a finished knockout match)
+  const eliminationMatch = finishedKnockout.find((m) => {
     const isHome = m.homeTeam === teamName;
     const scored = isHome ? (m.homeScore ?? 0) : (m.awayScore ?? 0);
     const conceded = isHome ? (m.awayScore ?? 0) : (m.homeScore ?? 0);
-    const won = scored > conceded;
+    return scored < conceded;
+  });
 
-    if (won && m.stage.includes("FINAL") && !m.stage.includes("SEMI") && !m.stage.includes("QUARTER")) {
-      // Won the final — tournament winner
-      progressionPoints = SCORING_CONFIG.winTournament;
-    } else if (!won) {
-      // Knocked out here — award points for this stage if it's the highest
-      const pts = stageProgressionPoints(m.stage);
-      if (pts > progressionPoints) {
-        progressionPoints = pts;
-      }
-    }
+  // Check if team won the final
+  const wonFinal = finishedKnockout.some((m) => {
+    if (!m.stage.includes("FINAL") || m.stage.includes("SEMI") || m.stage.includes("QUARTER")) return false;
+    const isHome = m.homeTeam === teamName;
+    const scored = isHome ? (m.homeScore ?? 0) : (m.awayScore ?? 0);
+    const conceded = isHome ? (m.awayScore ?? 0) : (m.homeScore ?? 0);
+    return scored > conceded;
+  });
+
+  if (wonFinal) {
+    progressionPoints = SCORING_CONFIG.winTournament;
+  } else if (eliminationMatch) {
+    // Award points for the stage they were knocked out at
+    progressionPoints = stageProgressionPoints(eliminationMatch.stage);
   }
 
   // Find team stats from standings

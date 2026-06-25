@@ -9,6 +9,7 @@ import { PersonTab } from "@/components/PersonTab";
 import { FixturesView } from "@/components/FixturesView";
 import { StandingsTable } from "@/components/StandingsTable";
 import { LandingPage } from "@/components/LandingPage";
+import { FunStats } from "@/components/FunStats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -183,6 +184,11 @@ export default function Home() {
                 fixtures={data.fixtures}
                 onSelectPerson={goToPlayer}
               />
+            </section>
+
+            <section>
+              <h2 className="section-heading">Fun Stats</h2>
+              <FunStats scores={data.participantScores} fixtures={data.fixtures} />
             </section>
 
             {/* Mobile player picker — visible on small screens */}
