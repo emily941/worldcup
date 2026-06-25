@@ -16,25 +16,13 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
     [fixtures]
   );
 
-  // Most Boring Owner — fewest total goals across their teams' matches
+  // Most Boring Owner — fewest goals scored across all their teams
   const boringOwners = useMemo(() => {
-    const ownerGoals = new Map<string, number>();
-    for (const s of scores) ownerGoals.set(s.participant.name, 0);
-
-    for (const m of finished) {
-      const total = (m.homeScore ?? 0) + (m.awayScore ?? 0);
-      const homeOwner = teamToParticipant[m.homeTeam];
-      const awayOwner = teamToParticipant[m.awayTeam];
-      if (homeOwner) ownerGoals.set(homeOwner, (ownerGoals.get(homeOwner) ?? 0) + total);
-      if (awayOwner && awayOwner !== homeOwner)
-        ownerGoals.set(awayOwner, (ownerGoals.get(awayOwner) ?? 0) + total);
-    }
-
-    return [...ownerGoals.entries()]
-      .sort((a, b) => a[1] - b[1])
-      .slice(0, 3)
-      .map(([name, goals]) => ({ name, value: goals }));
-  }, [scores, finished]);
+    return scores
+      .map((s) => ({ name: s.participant.name, value: s.totalGoals }))
+      .sort((a, b) => a.value - b.value)
+      .slice(0, 3);
+  }, [scores]);
 
   // Biggest Rivalry — pairs of owners whose teams have faced each other most
   const rivalries = useMemo(() => {
@@ -97,7 +85,7 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
   }, [scores]);
 
   const cards: { emoji: string; title: string; desc: string; entries: { name: string; value: number }[] }[] = [
-    { emoji: "😴", title: "Most Boring", desc: "Fewest total goals in their teams' matches", entries: boringOwners },
+    { emoji: "😴", title: "Most Boring", desc: "Fewest goals scored across all their teams", entries: boringOwners },
     { emoji: "⚔️", title: "Biggest Rivalry", desc: "Owners whose teams have faced each other the most", entries: rivalries },
     { emoji: "😭", title: "Unluckiest", desc: "Most goals conceded across all their teams", entries: unluckiest },
     { emoji: "👺", title: "Goal Goblin", desc: "Most goals scored across all their teams", entries: goalGoblins },
