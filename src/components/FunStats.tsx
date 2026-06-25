@@ -80,18 +80,18 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
       .slice(0, 3);
   }, [scores]);
 
-  const cards: { emoji: string; title: string; entries: { name: string; value: number }[]; unit: string }[] = [
-    { emoji: "😴", title: "Most Boring", entries: boringOwners, unit: "goals in matches" },
-    { emoji: "⚔️", title: "Biggest Rivalry", entries: rivalries, unit: "clashes" },
-    { emoji: "😭", title: "Unluckiest", entries: unluckiest, unit: "conceded" },
-    { emoji: "👺", title: "Goal Goblin", entries: goalGoblins, unit: "scored" },
+  const cards: { emoji: string; title: string; desc: string; entries: { name: string; value: number }[] }[] = [
+    { emoji: "😴", title: "Most Boring", desc: "Fewest total goals in their teams' matches", entries: boringOwners },
+    { emoji: "⚔️", title: "Biggest Rivalry", desc: "Owners whose teams have faced each other the most", entries: rivalries },
+    { emoji: "😭", title: "Unluckiest", desc: "Most goals conceded across all their teams", entries: unluckiest },
+    { emoji: "👺", title: "Goal Goblin", desc: "Most goals scored across all their teams", entries: goalGoblins },
   ];
 
   if (finished.length === 0) return null;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-      {cards.map(({ emoji, title, entries, unit }) => (
+      {cards.map(({ emoji, title, desc, entries }) => (
         <div
           key={title}
           className="rounded-2xl border border-border bg-card p-4 space-y-3"
@@ -102,6 +102,7 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
               {title}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground -mt-1">{desc}</p>
           <div className="space-y-2">
             {entries.map(({ name, value }, i) => (
               <div key={name} className="flex items-center justify-between gap-2">

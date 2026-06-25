@@ -178,17 +178,17 @@ export default function Home() {
             )}
 
             <section>
+              <h2 className="section-heading">Fun Stats</h2>
+              <FunStats scores={data.participantScores} fixtures={data.fixtures} />
+            </section>
+
+            <section>
               <h2 className="section-heading">Leaderboard</h2>
               <Leaderboard
                 scores={data.participantScores}
                 fixtures={data.fixtures}
                 onSelectPerson={goToPlayer}
               />
-            </section>
-
-            <section>
-              <h2 className="section-heading">Fun Stats</h2>
-              <FunStats scores={data.participantScores} fixtures={data.fixtures} />
             </section>
 
             {/* Mobile player picker — visible on small screens */}
