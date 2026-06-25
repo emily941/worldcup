@@ -72,6 +72,22 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
       .map(([name, goals]) => ({ name, value: goals }));
   }, [scores, finished]);
 
+  // Biggest Self-Own — matches where both teams belong to the same owner
+  const selfOwns = useMemo(() => {
+    const count = new Map<string, number>();
+    for (const m of finished) {
+      const homeOwner = teamToParticipant[m.homeTeam];
+      const awayOwner = teamToParticipant[m.awayTeam];
+      if (homeOwner && homeOwner === awayOwner) {
+        count.set(homeOwner, (count.get(homeOwner) ?? 0) + 1);
+      }
+    }
+    return [...count.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name, c]) => ({ name, value: c }));
+  }, [finished]);
+
   // Goal Goblin — most goals scored
   const goalGoblins = useMemo(() => {
     return scores
@@ -85,6 +101,7 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
     { emoji: "⚔️", title: "Biggest Rivalry", desc: "Owners whose teams have faced each other the most", entries: rivalries },
     { emoji: "😭", title: "Unluckiest", desc: "Most goals conceded across all their teams", entries: unluckiest },
     { emoji: "👺", title: "Goal Goblin", desc: "Most goals scored across all their teams", entries: goalGoblins },
+    ...(selfOwns.length > 0 ? [{ emoji: "🤦", title: "Biggest Self-Own", desc: "Times their own teams have played each other", entries: selfOwns }] : []),
   ];
 
   if (finished.length === 0) return null;
