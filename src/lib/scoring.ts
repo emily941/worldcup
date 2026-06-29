@@ -106,9 +106,15 @@ export function calculateTeamScore(
     }
   }
 
-  // Teams in knockout rounds are definitively qualified regardless of group-stage maths
+  // Teams in knockout rounds: qualified unless they lost (eliminated)
   if (stats && knockoutMatches.length > 0) {
-    stats.status = "qualified";
+    const lostKnockout = finishedKnockout.some((m) => {
+      const isHome = m.homeTeam === teamName;
+      const scored = isHome ? (m.homeScore ?? 0) : (m.awayScore ?? 0);
+      const conceded = isHome ? (m.awayScore ?? 0) : (m.homeScore ?? 0);
+      return scored < conceded;
+    });
+    stats.status = lostKnockout ? "eliminated" : "qualified";
   }
 
   return {

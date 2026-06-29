@@ -63,13 +63,22 @@ export function Leaderboard({ scores, fixtures, onSelectPerson }: LeaderboardPro
               }
             </div>
 
-            {/* Name + flags */}
+            {/* Name + alive teams */}
             <div className="flex-1 min-w-0">
               <div className="text-lg font-bold leading-tight">{score.participant.name}</div>
-              <div className="flex gap-0.5 mt-1 flex-wrap">
-                {score.participant.teams.map(t => (
-                  <span key={t} className="text-lg">{getFlag(t)}</span>
-                ))}
+              <div className="flex items-center gap-1 mt-1 flex-wrap">
+                {allEliminated ? (
+                  <span className="text-xs font-semibold text-red-400">All eliminated</span>
+                ) : (
+                  <>
+                    <span className="text-xs font-semibold text-emerald-400 mr-1">{score.teamsAlive} alive</span>
+                    {score.teams
+                      .filter(t => t.stats?.status !== "eliminated")
+                      .map(t => (
+                        <span key={t.teamName} className="text-lg" title={t.teamName}>{getFlag(t.teamName)}</span>
+                      ))}
+                  </>
+                )}
               </div>
             </div>
 
