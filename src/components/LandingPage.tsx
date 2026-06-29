@@ -461,6 +461,13 @@ export function LandingPage({ onEnter }: LandingPageProps) {
             ⚽ TAKE THE PENALTY
           </button>
 
+          <button
+            onClick={handleEnter}
+            className="mt-2 text-sm text-gray-500 hover:text-gray-300 underline underline-offset-4 transition-colors"
+          >
+            Skip to dashboard →
+          </button>
+
           {achievements.length > 0 && (
             <div className="text-xs text-gray-500 mt-2">
               {achievements.length} achievement{achievements.length !== 1 ? "s" : ""} earned
