@@ -76,6 +76,26 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
       .map(([name, c]) => ({ name, value: c }));
   }, [finished]);
 
+  // Deft Defence — fewest goals conceded
+  const deftDefence = useMemo(() => {
+    const conceded = new Map<string, number>();
+    for (const s of scores) conceded.set(s.participant.name, 0);
+
+    for (const m of finished) {
+      const homeOwner = teamToParticipant[m.homeTeam];
+      const awayOwner = teamToParticipant[m.awayTeam];
+      if (homeOwner)
+        conceded.set(homeOwner, (conceded.get(homeOwner) ?? 0) + (m.awayScore ?? 0));
+      if (awayOwner)
+        conceded.set(awayOwner, (conceded.get(awayOwner) ?? 0) + (m.homeScore ?? 0));
+    }
+
+    return [...conceded.entries()]
+      .sort((a, b) => a[1] - b[1])
+      .slice(0, 3)
+      .map(([name, goals]) => ({ name, value: goals }));
+  }, [scores, finished]);
+
   // Goal Goblin — most goals scored
   const goalGoblins = useMemo(() => {
     return scores
@@ -88,6 +108,7 @@ export function FunStats({ scores, fixtures }: FunStatsProps) {
     { emoji: "😴", title: "Most Boring", desc: "Fewest goals scored across all their teams", entries: boringOwners },
     { emoji: "⚔️", title: "Biggest Rivalry", desc: "Owners whose teams have faced each other the most", entries: rivalries },
     { emoji: "😭", title: "Unluckiest", desc: "Most goals conceded across all their teams", entries: unluckiest },
+    { emoji: "🛡️", title: "Deft Defence", desc: "Fewest goals conceded across all their teams", entries: deftDefence },
     { emoji: "👺", title: "Goal Goblin", desc: "Most goals scored across all their teams", entries: goalGoblins },
     ...(selfOwns.length > 0 ? [{ emoji: "🤦", title: "Biggest Self-Own", desc: "Times their own teams have played each other", entries: selfOwns }] : []),
   ];
